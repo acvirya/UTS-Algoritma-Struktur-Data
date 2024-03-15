@@ -1,0 +1,3 @@
+ADMIN#administrator@umn.ac.id#admin#Administrator#0000001
+STUDENT#anggatha.chandra@student.umn.ac.id#virya#Anggatha Chandra Virya#00000082588
+STUDENT#steven.jonathan@student.umn.ac.id#steven#Steven Jonathan#00000087645
