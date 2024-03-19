@@ -1,5 +1,5 @@
-Book1#author1#2000#1#1
-Book2#author2#2001#2#2
-Book3#author3#2002#2#2
-Book4#author4#2003#2#2
-Book5#author5#2004#1#1
+Book1#author1#publisher1#ref_number1#2000#1#2
+Book1#author1#publisher1#ref_number2#2001#1#1
+Book1#author2#publisher2#ref_number3#2002#1#1
+Book1#author3#publisher3#ref_number4#2003#1#2
+Book1#author4#publisher4#ref_number5#2004#1#2
