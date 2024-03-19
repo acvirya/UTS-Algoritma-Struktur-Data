@@ -1,3 +1,5 @@
 ADMIN#administrator@umn.ac.id#admin#Administrator#0000001
 STUDENT#anggatha.chandra@student.umn.ac.id#virya#Anggatha Chandra Virya#00000082588
 STUDENT#steven.jonathan@student.umn.ac.id#steven#Steven Jonathan#00000087645
+STUDENT#fernando.sunarto@student.umn.ac.id#fernando#Fernando Sunarto#00000083441
+STUDENT#fabian.dustin@student.umn.ac.id#bean#Fabian Dustin Candra#00000087657
