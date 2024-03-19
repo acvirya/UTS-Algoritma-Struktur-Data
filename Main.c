@@ -794,8 +794,9 @@ void returnBookMenu(Book **head_book, BorrowList **front_borrow, BorrowList **re
     front_selector = rear_selector = NULL;
     //front_borrow_clone = rear_borrow_clone = NULL;
 
-    if (!isEmpty(*front_borrow)){
+    if (isEmpty(*front_borrow)){
         printf("List is empty");
+        return;
     }
 
     displayBorrowData(front_borrow, rear_borrow);
