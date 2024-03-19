@@ -431,15 +431,7 @@ void fetchBorrowData(BorrowList **front, BorrowList **rear, Account account){
     Date borrow, due;
 
     FILE *fp;
-    if (strcmp(account.userType, ADMINUSER) == 0){
-        fp = fopen("Borrowing data.txt", "r");
-    }
-    else{
-        char filename[25];
-        strcpy(filename, account.NIM);
-        strcat(filename, "-History.txt");
-        fp = fopen(filename, "r");
-    }
+    fp = fopen("Borrowing data.txt", "r");
     if (fp != NULL){
         while (fscanf(fp,"%[^#]#%[^#]#%[^#]#%[^#]#%[^#]#%d/%d/%d#%d/%d/%d\n", name, NIM, title, ref_number, status, &borrow.day, &borrow.month, &borrow.year, &due.day, &due.month, &due.year) != EOF){
             if (strcmp(account.userType, ADMINUSER) == 0){//Admin
@@ -758,23 +750,30 @@ void displayBorrowData(BorrowList **front_borrow, BorrowList **rear_borrow){
 }
 
 void displayBorrowHistory(Account user){
-    FILE *fp = fopen("History.txt", "r");
+    FILE *fp;
+    if (strcmp(user.userType, ADMINUSER) == 0){
+        fp = fopen("History.txt", "r");
+    }
+    else if (strcmp(user.userType, STUDENTUSER) == 0){
+        char filename[25];
+        strcpy(filename, user.NIM);
+        strcat(filename, "-History.txt");
+        fp = fopen(filename, "r");
+    }
     BorrowList history;
     printf("======================================\n");
     printf("            Borrow History            \n");
     printf("======================================\n");
     if (fp != NULL){
         while(fscanf(fp, "%[^#]#%[^#]#%[^#]#%[^#]#%[^#]#%d/%d/%d#%d/%d/%d\n", history.name, history.NIM, history.title, history.ref_number, history.status, &history.borrow.day, &history.borrow.month, &history.borrow.year, &history.due.day, &history.due.month, &history.due.year) != EOF){
-            if ((strcmp(user.userType, ADMINUSER) == 0) || (strcmp(user.NIM, history.NIM) == 0)){
-                printf("Borrower       : %s\n", history.name);
-                printf("Borrower's NIM : %s\n", history.NIM);
-                printf("Title          : %s\n", history.title);
-                printf("Ref number     : %s\n", history.ref_number);
-                printf("Status         : %s\n", history.status);
-                printf("Borrow date    : %d/%d/%d\n", history.borrow.day, history.borrow.month, history.borrow.year);
-                printf("Due date       : %d/%d/%d\n\n", history.due.day, history.due.month, history.due.year);
-                printf("======================================\n");
-            }
+            printf("Borrower       : %s\n", history.name);
+            printf("Borrower's NIM : %s\n", history.NIM);
+            printf("Title          : %s\n", history.title);
+            printf("Ref number     : %s\n", history.ref_number);
+            printf("Status         : %s\n", history.status);
+            printf("Borrow date    : %d/%d/%d\n", history.borrow.day, history.borrow.month, history.borrow.year);
+            printf("Due date       : %d/%d/%d\n\n", history.due.day, history.due.month, history.due.year);
+            printf("======================================\n");
         }
         fclose(fp);
     }
