@@ -245,8 +245,9 @@ Account login_page(){
 
     while(1){
         fflush(stdin);
-        printf("     Halaman Sign in     \n");
-        printf("=========================\n");
+        printf("=======================================\n");
+        printf("             Halaman Log in            \n");
+        printf("=======================================\n");
         printf("Masukkan data\n");
         printf("Email: ");
         scanf("%[^\n]",email_input);
@@ -257,7 +258,6 @@ Account login_page(){
 
         int index = validate_account_input(email_input,password_input, account, current_size);
         if (index >= 0){
-            printf("login successfully, navigating to %s main page\n",(strcmp(account[index].userType, "ADMIN") == 0)? "ADMIN" : "STUDENT");
             temp = account[index];
             free(account);
             return temp;
@@ -282,17 +282,14 @@ void showAllBook(Book *head){
     Book *temp;
     temp = head;
 
-    printf("=======================================\n");
+    printf("==============================================================================================================================\n");
+    printf("| %-25s | %-15s | %-15s | %-25s | %-7s | %-5s | %-12s |\n", "Title", "Author", "Publisher", "Ref-number", "Release", "Stock", "Avaiable");
+    printf("==============================================================================================================================\n");
     while(temp != NULL){
-        printf("Title       : %s\n",temp->title);
-        printf("Author      : %s\n",temp->author);
-        printf("Publisher   : %s\n",temp->publisher);
-        printf("Ref-number  : %s\n",temp->ref_number);
-        printf("Release     : %d\n",temp->release);
-        printf("Stock       : %d\n",temp->stock);
-        printf("Avaiability : %s\n\n",temp->avaiable >= 1 ? "Avaiable" : "Not Avaiable");
+        printf("| %-25s | %-15s | %-15s | %-25s | %-7d | %-5d | %-12s |\n", temp->title, temp->author, temp->publisher, temp->ref_number, temp->release, temp->stock, (temp->avaiable >= 1 ? "Avaiable" : "Not Avaiable"));
         temp = temp->next;
     }
+    printf("==============================================================================================================================\n");
 }
 
 void *addNewBook(char *title, char *author, char *publisher, char *ref_number, int release, int stock, int avaiable, Book **head, Book **tail){
@@ -349,26 +346,29 @@ void searchBook_byTitle(Book *head, char *title_input){
             if (found == 1){
                 printf("Book title found!\n");//Found pertama print ini
             }
+            printf("=======================================\n");
             printf("Title       : %s\n",node->title);
             printf("Author      : %s\n",node->author);
             printf("Publisher   : %s\n",node->publisher);
             printf("Ref-number  : %s\n",node->ref_number);
             printf("Release     : %d\n",node->release);
             printf("Stock       : %d\n",node->stock);
-            printf("Avaiability : %s\n\n",node->avaiable >= 1 ? "Avaiable" : "Not Avaiable");
+            printf("Avaiability : %s\n",node->avaiable >= 1 ? "Avaiable" : "Not Avaiable");
         }
         node = node->next;
     }
     if (found == 0){
         printf("Book title not found!\n");
     }
+    printf("=======================================\n");
 }
 
 void searchBookMenu(Book *head){
     char title_input[40];
 
-    printf("     Search Book     \n");
-    printf("=====================\n");
+    printf("=======================================\n");
+    printf("              Search Book              \n");
+    printf("=======================================\n");
     fflush(stdin);
     printf("Title: ");
     scanf("%[^\n]",&title_input);
@@ -392,8 +392,9 @@ void addBookMenu(Book **head, Book **tail){
     Book newBook;
 
     fflush(stdin);
-    printf("       Add Book       \n");
-    printf("======================\n");
+    printf("=======================================\n");
+    printf("                Add Book               \n");
+    printf("=======================================\n");
     printf("Title       : ");
     scanf("%[^\n]",newBook.title);
     fflush(stdin);
@@ -416,6 +417,7 @@ void addBookMenu(Book **head, Book **tail){
 
     addNewBook(newBook.title, newBook.author, newBook.publisher, newBook.ref_number, newBook.release, newBook.stock, newBook.avaiable, head, tail);
     updateBookFile(*head);
+    printf("=======================================\n");
 }
 
 int isBorrowed(BorrowList **front_borrow,BorrowList **rear_borrow, char *bookRef){
@@ -425,10 +427,10 @@ int isBorrowed(BorrowList **front_borrow,BorrowList **rear_borrow, char *bookRef
 void removeBook(Book **head, Book **tail, BorrowList **front_borrow, BorrowList **rear_borrow){
     Book *selected = *head;
     char ref_number_input[25];
-    printf("     Remove Book     \n");
-    printf("=====================\n");
+    printf("=======================================\n");
+    printf("              Remove Book              \n");
+    printf("=======================================\n");
     showAllBook(*head);
-    printf("=====================\n");
     printf("Ref-number: ");
     fflush(stdin);
     scanf("%[^\n]",ref_number_input);
@@ -458,12 +460,14 @@ void removeBook(Book **head, Book **tail, BorrowList **front_borrow, BorrowList 
             }
             updateBookFile(*head);
             printf("Book removed\n");
+            printf("=======================================\n");
             return;
         }
         selected = selected->next;
     }
 
     printf("Book not found\n");
+    printf("=======================================\n");
 }
 
 //========================================================================================================
@@ -666,9 +670,9 @@ void borrowBook(Book **head_book,BorrowList **front_borrow, BorrowList **rear_bo
     }
 
     showAllBook(*head_book);
-    printf("=====================\n");
-    printf("     Borrow Book     \n");
-    printf("=====================\n");
+    printf("=======================================\n");
+    printf("              Borrow Book              \n");
+    printf("=======================================\n");
     fflush(stdin);
     printf("Title: ");
     scanf("%[^\n]",&title_input);
@@ -686,20 +690,20 @@ void borrowBook(Book **head_book,BorrowList **front_borrow, BorrowList **rear_bo
                 printf("Book title found!\n");
             }
 
-            printf("========================================\n");
+            printf("=======================================\n");
             printf("Title       : %s\n",node->title);
             printf("Author      : %s\n",node->author);
             printf("Publisher   : %s\n",node->publisher);
             printf("Ref-number  : %s\n",node->ref_number);
             printf("Release     : %d\n",node->release);
             printf("Stock       : %d\n",node->stock);
-            printf("Avaiability : %s\n\n",node->avaiable >= 1 ? "Avaiable" : "Not Avaiable");
+            printf("Avaiability : %s\n",node->avaiable >= 1 ? "Avaiable" : "Not Avaiable");
             addNewBook(node->title, node->author, node->publisher, node->ref_number, node->release, node->stock, node->avaiable, &selector_head, &selector_tail);
             selected = node;
         }
         node = node->next;
     }
-    printf("========================================\n");
+    printf("=======================================\n");
     if (found_title == 0){
         printf("Book title not found!\n");
         return;
@@ -768,7 +772,7 @@ void borrowBook(Book **head_book,BorrowList **front_borrow, BorrowList **rear_bo
             }
             fclose(fp);
 
-            printf("Book reserved, please pick it in the library in 7 days\n");
+            printf("Book borrowed!\n");
         }
         else{
             printf("You can't borrow a same book twice\n");
@@ -776,6 +780,7 @@ void borrowBook(Book **head_book,BorrowList **front_borrow, BorrowList **rear_bo
         }
 
     }
+    printf("=======================================\n");
 }
 
 void displayBorrowData(BorrowList **front_borrow, BorrowList **rear_borrow){
@@ -830,9 +835,9 @@ void displayBorrowHistory(Account user){
         fp = fopen(filename, "r");
     }
     BorrowList history;
-    printf("======================================\n");
-    printf("            Borrow History            \n");
-    printf("======================================\n");
+    printf("=======================================\n");
+    printf("            Borrow History             \n");
+    printf("=======================================\n");
     if (fp != NULL){
         while(fscanf(fp, "%[^#]#%[^#]#%[^#]#%[^#]#%[^#]#%d/%d/%d#%d/%d/%d\n", history.name, history.NIM, history.title, history.ref_number, history.status, &history.borrow.day, &history.borrow.month, &history.borrow.year, &history.due.day, &history.due.month, &history.due.year) != EOF){
             printf("Borrower       : %s\n", history.name);
@@ -842,7 +847,7 @@ void displayBorrowHistory(Account user){
             printf("Status         : %s\n", history.status);
             printf("Borrow date    : %d/%d/%d\n", history.borrow.day, history.borrow.month, history.borrow.year);
             printf("Due date       : %d/%d/%d\n\n", history.due.day, history.due.month, history.due.year);
-            printf("======================================\n");
+            printf("=======================================\n");
         }
         fclose(fp);
     }
@@ -852,11 +857,11 @@ void displayBorrowHistory(Account user){
 }
 
 void returnBookMenu(Book **head_book, BorrowList **front_borrow, BorrowList **rear_borrow, Date date){
-    int choose;
+    int loan_number, counter = 1;
     char ref_number[25];
     Account user;
 
-    BorrowList *front_selector, *rear_selector, selected;
+    BorrowList *front_selector, *rear_selector;
     front_selector = rear_selector = NULL;
 
     if (isEmpty(*front_borrow)){
@@ -865,9 +870,9 @@ void returnBookMenu(Book **head_book, BorrowList **front_borrow, BorrowList **re
     }
 
     displayBorrowData(front_borrow, rear_borrow);
-    printf("Ref-Number: ");
+    printf("Loan Number: ");
     fflush(stdin);
-    scanf("%[^\n]",ref_number);
+    scanf("%d", &loan_number);
     fflush(stdin);
 
     while(!isEmpty(*front_borrow)){
@@ -877,8 +882,9 @@ void returnBookMenu(Book **head_book, BorrowList **front_borrow, BorrowList **re
 
     bool find = false;
     while(!isEmpty(front_selector)){
-        if (strcmp(front_selector->ref_number, ref_number) == 0){
+        if (counter == loan_number){
             find = true;
+            strcpy(ref_number, front_selector->ref_number);
             if (strcmp(front_selector->status, "Overdue") == 0){
                 strcpy(front_selector->status, "Returned, Overdue");
             }
@@ -895,13 +901,12 @@ void returnBookMenu(Book **head_book, BorrowList **front_borrow, BorrowList **re
             fprintf(fpAdmin, "%s#%s#%s#%s#%s#%d/%d/%d#%d/%d/%d\n", front_selector->name, front_selector->NIM, front_selector->title, front_selector->ref_number, front_selector->status, front_selector->borrow.day, front_selector->borrow.month, front_selector->borrow.year, front_selector->due.day, front_selector->due.month, front_selector->due.year);
             fclose(fpUser);
             fclose(fpAdmin);
-            dequeueBorrowData(&front_selector);
         }
         else{
             copy_front_queue(front_selector, front_borrow, rear_borrow);
-            dequeueBorrowData(&front_selector);
         }
-
+        dequeueBorrowData(&front_selector);
+        counter++;
     }
 
     if (find == true){
@@ -921,6 +926,7 @@ void returnBookMenu(Book **head_book, BorrowList **front_borrow, BorrowList **re
     else{
         printf("Book not found!\n");
     }
+    printf("=======================================\n");
 }
 
 //========================================================================================================
@@ -982,12 +988,12 @@ void adminPage(Account user){
         printf("=======================================\n");
         printf("Welcome, %s\n",user.name);
         printf("Current time: %d/%d/%d\n",date.day, date.month, date.year);
-        printf("[1] Show Books list\n");
-        printf("[2] Search book\n");
+        printf("[1] Show books list\n");
+        printf("[2] Search book title\n");
         printf("[3] Add new book\n");
         printf("[4] Remove a book\n");
-        printf("[5] Show borrowed book list\n");
-        printf("[6] Return borrowed book\n");
+        printf("[5] Show loan list\n");
+        printf("[6] Return loan book\n");
         printf("[7] Show borrow history\n");
         printf("[8] Log out\n");
         printf("[9] Exit\n");
@@ -1057,21 +1063,20 @@ void studentPage(Account user){
     while(1){
 
         updateBorrowData(&head_book, &front_borrow, &rear_borrow, user, date);
-
+        option = -1;
         fflush(stdin);
         printf("=======================================\n");
         printf("               Main Page               \n");
         printf("=======================================\n");
         printf("Welcome, %s\n",user.name);
         printf("Current time: %d/%d/%d\n",date.day, date.month, date.year);
-        printf("[1] Show Books list\n");
-        printf("[2] Search book\n");
+        printf("[1] Show books list\n");
+        printf("[2] Search book title\n");
         printf("[3] Borrow a book\n");
-        printf("[4] Return/cancel a book reservation\n");
-        printf("[5] Show reservation list\n");
-        printf("[6] Show borrow history\n");
-        printf("[7] Log out\n");
-        printf("[8] Exit\n");
+        printf("[4] Show loan list\n");
+        printf("[5] Show loan history\n");
+        printf("[6] Log out\n");
+        printf("[7] Exit\n");
         printf("[0] Change current time (for debugging)\n");
         printf("\nOption: ");
         scanf("%d",&option);
@@ -1090,19 +1095,16 @@ void studentPage(Account user){
             borrowBook(&head_book, &front_borrow, &rear_borrow, date, user);
         }
         else if (option == 4){
-            //returnBookMenu(&head_book, &front_borrow, &rear_borrow, date, user);
-        }
-        else if (option == 5){
             displayBorrowData(&front_borrow, &rear_borrow);
         }
-        else if (option == 6){
+        else if (option == 5){
             displayBorrowHistory(user);
         }
-        else if (option == 7){
+        else if (option == 6){
             freeMemory(&head_book, &tail_book, &front_borrow, &rear_borrow);
             break;
         }
-        else if (option == 8){
+        else if (option == 7){
             freeMemory(&head_book, &tail_book, &front_borrow, &rear_borrow);
             exit(0);
         }
@@ -1120,10 +1122,11 @@ int main(){
 
     while(1){
         fflush(stdin);
-        printf("      UMN Library      \n");
-        printf(" Book-borrowing System \n");
-        printf("=======================\n");
-        printf("[1] Sign in\n");
+        printf("=======================================\n");
+        printf("              UMN Library              \n");
+        printf("         Book-borrowing System         \n");
+        printf("=======================================\n");
+        printf("[1] Log in\n");
         printf("[2] Exit\n\n");
         printf("Option: ");
         scanf("%d",&option);
