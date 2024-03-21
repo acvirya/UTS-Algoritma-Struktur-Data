@@ -157,7 +157,6 @@ Date addTime(Date date, int days){
             date.month += 1;
         }
         else{
-            ;
             date.day = result;
         }
     }
@@ -622,7 +621,7 @@ void updateBorrowData(Book **head_book, BorrowList **front_borrow, BorrowList **
     while(!isEmpty(front_selector)){
         time_remaining = check_date(date, front_selector->due);
         //Cek apakah pinjam lebih dari 7 hari / overdue
-        if (time_remaining <= 0 && (strcmp(front_borrow_clone->status, "Borrowed") == 0)){
+        if (time_remaining <= 0 && (strcmp(front_borrow_clone->status, "Borrowing") == 0)){
             isoverdue = true;
             strcpy(front_borrow_clone->status, "Overdue");
             copy_front_queue(front_borrow_clone, front_borrow, rear_borrow);
