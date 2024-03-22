@@ -61,7 +61,7 @@ typedef struct Queue{
 /*===================== Initialize Queue ===================*/
 void initializeQueue(Queue* q, int size) {
     q->maxSize = size;
-    q->borrowQueue = (BorrowList*)malloc(sizeof(BorrowList) * size);
+    q->borrowQueue = (BorrowList*) malloc(sizeof(BorrowList) * size);
     q->front = 0;
     q->rear = -1;
     q->itemCount = 0;
@@ -177,7 +177,6 @@ Date addTime(Date date, int days){
             date.month += 1;
         }
         else{
-            ;
             date.day = result;
         }
     }
@@ -526,14 +525,22 @@ void copy_front_queue(Queue *origin, Queue *destination){
 }
 
 int check_duplicate_borrow(Queue *borrowQueue, char *bookRef){
+
     int flag = 0;
     int current = borrowQueue->front;
 
-    while(current != borrowQueue->rear){
-        if (strcmp(borrowQueue->borrowQueue[current].ref_number, bookRef) == 0){
-            flag++;
+    if(borrowQueue->rear == -1){
+        printf("Borrow queue is still empty\n\n");
+        return flag;
+    }
+
+    else{
+        while(current != borrowQueue->rear){
+            if (strcmp(borrowQueue->borrowQueue[current].ref_number, bookRef) == 0){
+                flag++;
+            }
+            current = (current + 1) % borrowQueue->maxSize;
         }
-        current = (current + 1) % borrowQueue->maxSize;
     }
 
     return flag;
@@ -585,7 +592,7 @@ void updateBorrowData(Queue *q, Account user, Date date){
     while(!isEmpty(&borrowQueueClone)){
         time_remaining = check_date(date, borrowQueueClone.borrowQueue[borrowQueueClone.front].due);
         //Cek apakah pinjam lebih dari 7 hari / overdue
-        if (time_remaining <= 0 && (strcmp(borrowQueueClone.borrowQueue[borrowQueueClone.front].status, "Borrowed") == 0)){
+        if (time_remaining <= 0 && (strcmp(borrowQueueClone.borrowQueue[borrowQueueClone.front].status, "Borrowing") == 0)){
             isoverdue = true;
             strcpy(borrowQueueClone.borrowQueue[borrowQueueClone.front].status, "Overdue");
             enqueueBorrowData(q, borrowQueueClone.borrowQueue[borrowQueueClone.front].name, borrowQueueClone.borrowQueue[borrowQueueClone.front].NIM, borrowQueueClone.borrowQueue[borrowQueueClone.front].title, borrowQueueClone.borrowQueue[borrowQueueClone.front].ref_number, borrowQueueClone.borrowQueue[borrowQueueClone.front].status, borrowQueueClone.borrowQueue[borrowQueueClone.front].borrow, borrowQueueClone.borrowQueue[borrowQueueClone.front].due);
@@ -645,6 +652,7 @@ void borrowBook(Book *books, int bookCount, Queue *borrowQueue, Date date, Accou
             selected = books[i];
         }
     }
+
     printf("========================================\n");
     if (found_title == 0){
         printf("Book title not found!\n");
@@ -673,13 +681,13 @@ void borrowBook(Book *books, int bookCount, Queue *borrowQueue, Date date, Accou
         if (found_title == 1){
             strcpy(ref_number_input, selected.ref_number);
         }
+
         if (check_duplicate_borrow(borrowQueue, ref_number_input) == 0){
             if (selected.avaiable == 0){
                 printf("Book is not avaiable for now\n");
                 return;
             }
 
-            selected.avaiable -= 1;
             Date due;
             due = addTime(date, 7);
             enqueueBorrowData(borrowQueue, user.name, user.NIM, selected.title, selected.ref_number, "Borrowing", date, due);
@@ -689,7 +697,7 @@ void borrowBook(Book *books, int bookCount, Queue *borrowQueue, Date date, Accou
             strcat(filename, "-Borrowing data.txt");
 
             FILE *fp = fopen(filename, "a");
-            fprintf(fp,"%s#%s#%s#%s#%s#%d/%d/%d#%d/%d/%d\n", borrowQueue->borrowQueue[borrowQueue->rear].name, borrowQueue->borrowQueue[borrowQueue->rear].NIM, borrowQueue->borrowQueue[borrowQueue->rear].title, borrowQueue->borrowQueue[borrowQueue->rear].ref_number, borrowQueue->borrowQueue[borrowQueue->rear].status, borrowQueue->borrowQueue[borrowQueue->rear].borrow.day, borrowQueue->borrowQueue[borrowQueue->rear].borrow.month, borrowQueue->borrowQueue[borrowQueue->rear].borrow.year, borrowQueue->borrowQueue[borrowQueue->rear].due.day, borrowQueue->borrowQueue[borrowQueue->rear].due.month, borrowQueue->borrowQueue[borrowQueue->rear].due.year);
+            fprintf(fp, "%s#%s#%s#%s#%s#%d/%d/%d#%d/%d/%d\n", borrowQueue->borrowQueue[borrowQueue->rear].name, borrowQueue->borrowQueue[borrowQueue->rear].NIM, borrowQueue->borrowQueue[borrowQueue->rear].title, borrowQueue->borrowQueue[borrowQueue->rear].ref_number, borrowQueue->borrowQueue[borrowQueue->rear].status, borrowQueue->borrowQueue[borrowQueue->rear].borrow.day, borrowQueue->borrowQueue[borrowQueue->rear].borrow.month, borrowQueue->borrowQueue[borrowQueue->rear].borrow.year, borrowQueue->borrowQueue[borrowQueue->rear].due.day, borrowQueue->borrowQueue[borrowQueue->rear].due.month, borrowQueue->borrowQueue[borrowQueue->rear].due.year);
             fclose(fp);
 
             fp = fopen("Book data.txt", "w");
@@ -700,6 +708,7 @@ void borrowBook(Book *books, int bookCount, Queue *borrowQueue, Date date, Accou
             fclose(fp);
 
             printf("Book reserved, please pick it in the library in 2 days\n");
+            selected.avaiable -= 1;
         }
         else{
             printf("You can't borrow a same book twice\n");
@@ -859,7 +868,7 @@ void adminPage(Account user){
 
     FILE *fp = fopen("Account.txt", "r");
     Account temp_account;
-    while(fscanf(fp,"%[^#]#%[^#]#%[^#]#%[^#]#%[^\n]\n",temp_account.userType,temp_account.email,temp_account.password,temp_account.name,temp_account.NIM) != EOF){
+    while(fscanf(fp, "%[^#]#%[^#]#%[^#]#%[^#]#%[^\n]\n", temp_account.userType,temp_account.email,temp_account.password,temp_account.name,temp_account.NIM) != EOF){
         fetchBorrowData(&borrowQueue, temp_account);
     }
     fclose(fp);
@@ -889,7 +898,7 @@ void adminPage(Account user){
         printf("[9] Exit\n");
         printf("[0] Change current time (for debugging)\n");
         printf("\nOption: ");
-        scanf("%d",&option);
+        scanf("%d", &option);
         printf("\n");
 
         if (option == 0){
@@ -987,7 +996,7 @@ void studentPage(Account user){
             searchBookMenu(books, bookCount);
         }
         else if (option == 3){
-             borrowBook(books, bookCount, &borrowQueue, date, user);
+            borrowBook(books, bookCount, &borrowQueue, date, user);
         }
         else if (option == 4){
             returnBookMenu(&borrowQueue, date, user);
