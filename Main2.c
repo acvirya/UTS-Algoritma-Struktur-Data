@@ -512,12 +512,13 @@ void fetchBorrowData(Queue *q, Account account){
     strcat(filename, "-Borrowing data.txt");
     fp = fopen(filename, "r");
     if (fp != NULL){
-        while (fscanf(fp,"%[^#]#%[^#]#%[^#]#%[^#]#%[^#]#%d/%d/%d#%d/%d/%d\n", name, NIM, title, ref_number, status, &borrow.day, &borrow.month, &borrow.year, &due.day, &due.month, &due.year) != EOF){
+        while (fscanf(fp,"%[^#]# %[^#]# %[^#]# %[^#]# %[^#]# %d/%d/%d# %d/%d/%d\n", name, NIM, title, ref_number, status, &borrow.day, &borrow.month, &borrow.year, &due.day, &due.month, &due.year) != EOF){
             enqueueBorrowData(q, name, NIM, title, ref_number, status, borrow, due);
         }
         fclose(fp);
     }
 }
+
 
 void copy_front_queue(Queue *origin, Queue *destination){
     BorrowList data = origin->borrowQueue[origin->front];
@@ -572,6 +573,9 @@ void updateBorrowFile(Queue *borrowQueue, Account user){
     while(current != borrowQueue->rear){
         fprintf(fp, "%s#%s#%s#%s#%s#%d/%d/%d#%d/%d/%d\n", borrowQueue->borrowQueue[current].name, borrowQueue->borrowQueue[current].NIM, borrowQueue->borrowQueue[current].title, borrowQueue->borrowQueue[current].ref_number, borrowQueue->borrowQueue[current].status, borrowQueue->borrowQueue[current].borrow.day, borrowQueue->borrowQueue[current].borrow.month, borrowQueue->borrowQueue[current].borrow.year, borrowQueue->borrowQueue[current].due.day, borrowQueue->borrowQueue[current].due.month, borrowQueue->borrowQueue[current].due.year);
         current = (current + 1) % borrowQueue->maxSize;
+        if (current == borrowQueue->front) {
+            break;
+        }
     }
     fclose(fp);
 }
@@ -611,7 +615,6 @@ void updateBorrowData(Queue *q, Account user, Date date){
 int check_full_loan(Queue *q){
     return q->itemCount;
 }
-
 
 /*===================== Borrow Data ===================*/
 void borrowBook(Book *books, int bookCount, Queue *borrowQueue, Date date, Account user){
@@ -721,30 +724,42 @@ void displayBorrowData(Queue *q){
     Queue borrowQueueClone;
     initializeQueue(&borrowQueueClone, q->maxSize);
 
+    Queue tempQueue;
+    initializeQueue(&tempQueue, q->maxSize);
+
     while(!isEmpty(q)){
         copy_front_queue(q, &borrowQueueClone);
+        copy_front_queue(q, &tempQueue);  
         dequeueBorrowData(q);
     }
 
-    printf("======================================\n");
-    printf("             Borrow List              \n");
-    printf("======================================\n\n");
+    while(!isEmpty(&tempQueue)){
+        copy_front_queue(&tempQueue, q);
+        dequeueBorrowData(&tempQueue);
+    }
+
     if (isEmpty(&borrowQueueClone)){
-        printf("List empty\n\n");
-        printf("======================================\n");
+        printf("List is empty\n\n");
         return;
+    }
+    else {
+        printf("======================================\n");
+        printf("             Borrow List              \n");
+        printf("======================================\n\n");
     }
 
     int i = 1;
     while(!isEmpty(&borrowQueueClone)){
-        printf("Loan #%d\n", i);
-        i++;
-        printf("Title       : %s\n", borrowQueueClone.borrowQueue[borrowQueueClone.front].title);
-        printf("Ref number  : %s\n", borrowQueueClone.borrowQueue[borrowQueueClone.front].ref_number);
-        printf("Status      : %s\n", borrowQueueClone.borrowQueue[borrowQueueClone.front].status);
-        printf("Borrow date : %d/%d/%d\n", borrowQueueClone.borrowQueue[borrowQueueClone.front].borrow.day, borrowQueueClone.borrowQueue[borrowQueueClone.front].borrow.month, borrowQueueClone.borrowQueue[borrowQueueClone.front].borrow.year);
-        printf("Due date    : %d/%d/%d\n\n", borrowQueueClone.borrowQueue[borrowQueueClone.front].due.day, borrowQueueClone.borrowQueue[borrowQueueClone.front].due.month, borrowQueueClone.borrowQueue[borrowQueueClone.front].due.year);
-        printf("======================================\n");
+        if (strcmp(borrowQueueClone.borrowQueue[borrowQueueClone.front].status, "Borrowing") == 0) {
+            printf("Loan #%d\n", i);
+            i++;
+            printf("Title       : %s\n", borrowQueueClone.borrowQueue[borrowQueueClone.front].title);
+            printf("Ref number  : %s\n", borrowQueueClone.borrowQueue[borrowQueueClone.front].ref_number);
+            printf("Status      : %s\n", borrowQueueClone.borrowQueue[borrowQueueClone.front].status);
+            printf("Borrow date : %d/%d/%d\n", borrowQueueClone.borrowQueue[borrowQueueClone.front].borrow.day, borrowQueueClone.borrowQueue[borrowQueueClone.front].borrow.month, borrowQueueClone.borrowQueue[borrowQueueClone.front].borrow.year);
+            printf("Due date    : %d/%d/%d\n\n", borrowQueueClone.borrowQueue[borrowQueueClone.front].due.day, borrowQueueClone.borrowQueue[borrowQueueClone.front].due.month, borrowQueueClone.borrowQueue[borrowQueueClone.front].due.year);
+            printf("======================================\n");
+        }
         dequeueBorrowData(&borrowQueueClone);
     }
 }
@@ -818,11 +833,15 @@ void returnBookMenu(Queue *q, Date date, Account user){
             while(!isEmpty(&selectorQueue)){
                 if (current == choose){
                     strcpy(ref_number, selectorQueue.borrowQueue[selectorQueue.front].ref_number);
-                    strcpy(selectorQueue.borrowQueue[selectorQueue.front].status, "Returning");
+                    if(strcmp(selectorQueue.borrowQueue[selectorQueue.front].status, "Borrowing") == 0) {
+                        strcpy(selectorQueue.borrowQueue[selectorQueue.front].status, "Returned");
+                    }
                 }
-
-                copy_front_queue(&selectorQueue, q);
+                if(strcmp(selectorQueue.borrowQueue[selectorQueue.front].status, "Borrowing") == 0) {
+                    copy_front_queue(&selectorQueue, q);
+                }
                 dequeueBorrowData(&selectorQueue);
+                current++;
             }
             updateBorrowFile(q, user);
         }
