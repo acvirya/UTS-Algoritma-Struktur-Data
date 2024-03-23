@@ -243,7 +243,6 @@ Account login_page(){
             strcpy(account[current_size-1].password,password);
             strcpy(account[current_size-1].name,name);
             strcpy(account[current_size-1].NIM,NIM);
-            printf("%s %s\n",account[current_size-1].email, account[current_size-1].password);
             current_size++;
         }
         current_size--;
