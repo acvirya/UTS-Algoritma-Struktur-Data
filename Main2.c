@@ -643,7 +643,6 @@ void updateBorrowFile(Queue *borrowQueue, Account user)
     fp = fopen(filename, "w");
 
     int current = borrowQueue->front;
-    printf("%d", borrowQueue->front);
     while (current != borrowQueue->rear)
     {
         fprintf(fp, "%s#%s#%s#%s#%s#%d/%d/%d#%d/%d/%d\n", borrowQueue->borrowQueue[current].name, borrowQueue->borrowQueue[current].NIM, borrowQueue->borrowQueue[current].title, borrowQueue->borrowQueue[current].ref_number, borrowQueue->borrowQueue[current].status, borrowQueue->borrowQueue[current].borrow.day, borrowQueue->borrowQueue[current].borrow.month, borrowQueue->borrowQueue[current].borrow.year, borrowQueue->borrowQueue[current].due.day, borrowQueue->borrowQueue[current].due.month, borrowQueue->borrowQueue[current].due.year);
@@ -1173,11 +1172,10 @@ void studentPage(Account user)
         printf("[1] Show Books list\n");
         printf("[2] Search book\n");
         printf("[3] Borrow a book\n");
-        printf("[4] Return/cancel a book reservation\n");
-        printf("[5] Show reservation list\n");
-        printf("[6] Show borrow history\n");
-        printf("[7] Log out\n");
-        printf("[8] Exit\n");
+        printf("[4] Show reservation list\n");
+        printf("[5] Show borrow history\n");
+        printf("[6] Log out\n");
+        printf("[7] Exit\n");
         printf("[0] Change current time (for debugging)\n");
         printf("\nOption: ");
         scanf("%d", &option);
@@ -1201,22 +1199,18 @@ void studentPage(Account user)
         }
         else if (option == 4)
         {
-            // returnBookMenu(&borrowQueue, date, user);
+            displayBorrowData(&borrowQueue);
         }
         else if (option == 5)
         {
-            displayBorrowData(&borrowQueue);
-        }
-        else if (option == 6)
-        {
             displayBorrowHistory(user);
         }
-        else if (option == 7)
+        else if (option == 6)
         {
             freeMemory(&books, &bookCount, &borrowQueue);
             return;
         }
-        else if (option == 8)
+        else if (option == 7)
         {
             freeMemory(&books, &bookCount, &borrowQueue);
             exit(0);
