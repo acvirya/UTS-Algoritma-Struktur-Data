@@ -531,7 +531,7 @@ int check_duplicate_borrow(Queue *borrowQueue, char *bookRef){
     int current = borrowQueue->front;
 
     if(borrowQueue->rear == -1){
-        printf("Borrow queue is still empty\n\n");
+        //printf("Borrow queue is still empty\n\n");
         return flag;
     }
 
@@ -570,12 +570,14 @@ void updateBorrowFile(Queue *borrowQueue, Account user){
     fp = fopen(filename, "w");
 
     int current = borrowQueue->front;
+    printf("%d",borrowQueue->front);
     while(current != borrowQueue->rear){
         fprintf(fp, "%s#%s#%s#%s#%s#%d/%d/%d#%d/%d/%d\n", borrowQueue->borrowQueue[current].name, borrowQueue->borrowQueue[current].NIM, borrowQueue->borrowQueue[current].title, borrowQueue->borrowQueue[current].ref_number, borrowQueue->borrowQueue[current].status, borrowQueue->borrowQueue[current].borrow.day, borrowQueue->borrowQueue[current].borrow.month, borrowQueue->borrowQueue[current].borrow.year, borrowQueue->borrowQueue[current].due.day, borrowQueue->borrowQueue[current].due.month, borrowQueue->borrowQueue[current].due.year);
         current = (current + 1) % borrowQueue->maxSize;
         if (current == borrowQueue->front) {
             break;
         }
+
     }
     fclose(fp);
 }
@@ -690,6 +692,11 @@ void borrowBook(Book *books, int bookCount, Queue *borrowQueue, Date date, Accou
                 printf("Book is not avaiable for now\n");
                 return;
             }
+            for(int i = 0; i < bookCount; i++){
+                if (strcmp(books[i].ref_number, selected.ref_number) == 0){
+                    books[i].avaiable -= 1;
+                }
+            }
 
             Date due;
             due = addTime(date, 7);
@@ -729,7 +736,7 @@ void displayBorrowData(Queue *q){
 
     while(!isEmpty(q)){
         copy_front_queue(q, &borrowQueueClone);
-        copy_front_queue(q, &tempQueue);  
+        copy_front_queue(q, &tempQueue);
         dequeueBorrowData(q);
     }
 
@@ -799,9 +806,10 @@ void displayBorrowHistory(Account user){
 }
 
 /*===================== Return Book ===================*/
-void returnBookMenu(Queue *q, Date date, Account user){
+void returnBookMenu(Book *book, int booksCount, Queue *q, Date date){
     int choose, flag = 0;
     int counter = 0, current = 1;
+    Account user;
 
     char ref_number[25];
 
@@ -817,6 +825,8 @@ void returnBookMenu(Queue *q, Date date, Account user){
 
     printf("Choose: ");
     scanf("%d",&choose);
+
+    //cek choose
     if ((choose < 1) || (choose > 4)){
         flag++;
     }
@@ -830,20 +840,44 @@ void returnBookMenu(Queue *q, Date date, Account user){
             printf("Invalid input");
         }
         else{
+            int find = 0;
             while(!isEmpty(&selectorQueue)){
                 if (current == choose){
+                    find = 1;
                     strcpy(ref_number, selectorQueue.borrowQueue[selectorQueue.front].ref_number);
+                    if(strcmp(selectorQueue.borrowQueue[selectorQueue.front].status, "Overdue") == 0) {
+                        strcpy(selectorQueue.borrowQueue[selectorQueue.front].status, "Returned, Overdue");
+                    }
                     if(strcmp(selectorQueue.borrowQueue[selectorQueue.front].status, "Borrowing") == 0) {
                         strcpy(selectorQueue.borrowQueue[selectorQueue.front].status, "Returned");
                     }
+
+                    strcpy(user.NIM, selectorQueue.borrowQueue[selectorQueue.front].NIM);
+                    char userFileName[25];
+                    strcpy(userFileName, selectorQueue.borrowQueue[selectorQueue.front].NIM);
+                    strcat(userFileName, "-History.txt");
+                    FILE *fpUser = fopen(userFileName, "a");
+                    FILE *fpAdmin = fopen("History.txt", "a");
+                    fprintf(fpAdmin, "%s#%s#%s#%s#%s#%d/%d/%d#%d/%d/%d\n", selectorQueue.borrowQueue[selectorQueue.front].name, selectorQueue.borrowQueue[selectorQueue.front].NIM, selectorQueue.borrowQueue[selectorQueue.front].title, selectorQueue.borrowQueue[selectorQueue.front].ref_number, selectorQueue.borrowQueue[selectorQueue.front].status, selectorQueue.borrowQueue[selectorQueue.front].borrow.day, selectorQueue.borrowQueue[selectorQueue.front].borrow.month, selectorQueue.borrowQueue[selectorQueue.front].borrow.year, selectorQueue.borrowQueue[selectorQueue.front].due.day, selectorQueue.borrowQueue[selectorQueue.front].due.month, selectorQueue.borrowQueue[selectorQueue.front].due.year);
+                    fprintf(fpUser, "%s#%s#%s#%s#%s#%d/%d/%d#%d/%d/%d\n", selectorQueue.borrowQueue[selectorQueue.front].name, selectorQueue.borrowQueue[selectorQueue.front].NIM, selectorQueue.borrowQueue[selectorQueue.front].title, selectorQueue.borrowQueue[selectorQueue.front].ref_number, selectorQueue.borrowQueue[selectorQueue.front].status, selectorQueue.borrowQueue[selectorQueue.front].borrow.day, selectorQueue.borrowQueue[selectorQueue.front].borrow.month, selectorQueue.borrowQueue[selectorQueue.front].borrow.year, selectorQueue.borrowQueue[selectorQueue.front].due.day, selectorQueue.borrowQueue[selectorQueue.front].due.month, selectorQueue.borrowQueue[selectorQueue.front].due.year);
+                    fclose(fpUser);
+                    fclose(fpAdmin);
                 }
-                if(strcmp(selectorQueue.borrowQueue[selectorQueue.front].status, "Borrowing") == 0) {
+                else{
                     copy_front_queue(&selectorQueue, q);
                 }
                 dequeueBorrowData(&selectorQueue);
                 current++;
             }
-            updateBorrowFile(q, user);
+            if (find == 1){
+                for(int i = 0; i < booksCount; i++){
+                    if (strcmp(book[i].ref_number, ref_number) == 0){
+                        book[i].avaiable += 1;
+                        break;
+                    }
+                }
+                updateBorrowFile(q,user);
+            }
         }
     }
 }
@@ -939,7 +973,7 @@ void adminPage(Account user){
             displayBorrowData(&borrowQueue);
         }
         else if (option == 6){
-            returnBookMenu(&borrowQueue, date, user);
+            returnBookMenu(books, bookCount, &borrowQueue, date);
         }
         else if (option == 7){
             displayBorrowHistory(user);
@@ -1018,7 +1052,7 @@ void studentPage(Account user){
             borrowBook(books, bookCount, &borrowQueue, date, user);
         }
         else if (option == 4){
-            returnBookMenu(&borrowQueue, date, user);
+            //returnBookMenu(&borrowQueue, date, user);
         }
         else if (option == 5){
             displayBorrowData(&borrowQueue);
