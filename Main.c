@@ -228,7 +228,7 @@ Account login_page(){
             strcpy(account[current_size-1].password,password);
             strcpy(account[current_size-1].name,name);
             strcpy(account[current_size-1].NIM,NIM);
-            printf("%s %s\n",account[current_size-1].email, account[current_size-1].password);
+            //printf("%s %s\n",account[current_size-1].email, account[current_size-1].password);
             current_size++;
         }
         current_size--;
@@ -682,6 +682,7 @@ void borrowBook(Book **head_book,BorrowList **front_borrow, BorrowList **rear_bo
     Book *selector_head, *selector_tail, *selected;
     selector_head = selector_tail = selected = NULL;
 
+
     while(node != NULL){
         if (strcmp(node->title,title_input) == 0){
             found_title++;
@@ -743,7 +744,6 @@ void borrowBook(Book **head_book,BorrowList **front_borrow, BorrowList **rear_bo
             strcpy(ref_number_input, selected->ref_number);
         }
         if (check_duplicate_borrow(front_borrow, rear_borrow, ref_number_input) == 0){
-            //printf("not duplicate\n");
             if (selected->avaiable == 0){
                 printf("Book is not avaiable for now\n");
                 return;
